@@ -20,6 +20,11 @@ class CalculatorAppState extends State<MainApp> {
   final Color _buttonColorGrey = Colors.grey[500];
   final Color _textColorWhite = Colors.white;
 
+  int valueA;
+  int valueB;
+  var sbValue = new StringBuffer();
+  String operator;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -45,7 +50,7 @@ class CalculatorAppState extends State<MainApp> {
                   alignment: Alignment.bottomRight,
                   children: <Widget>[
                     AutoSizeText(
-                      "0",
+                      sbValue.toString(),
                       style: Theme.of(context).textTheme.display2,
                       maxLines: 1,
                     ),
@@ -76,7 +81,7 @@ class CalculatorAppState extends State<MainApp> {
                                   fontSize: _buttonFontSize),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              clearValue();
                             },
                           ),
                         ),
@@ -90,7 +95,7 @@ class CalculatorAppState extends State<MainApp> {
                               color: _buttonColorGrey,
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              deleteValue();
                             },
                           ),
                         ),
@@ -107,7 +112,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("/");
                             },
                           ),
                         )
@@ -132,7 +137,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("7");
                             },
                           ),
                         ),
@@ -149,7 +154,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("8");
                             },
                           ),
                         ),
@@ -166,7 +171,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("9");
                             },
                           ),
                         ),
@@ -183,7 +188,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("x");
                             },
                           ),
                         ),
@@ -208,7 +213,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("4");
                             },
                           ),
                         ),
@@ -225,7 +230,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("5");
                             },
                           ),
                         ),
@@ -242,7 +247,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("6");
                             },
                           ),
                         ),
@@ -259,7 +264,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("-");
                             },
                           ),
                         ),
@@ -284,7 +289,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("1");
                             },
                           ),
                         ),
@@ -301,7 +306,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("2");
                             },
                           ),
                         ),
@@ -311,14 +316,14 @@ class CalculatorAppState extends State<MainApp> {
                             color: _buttonColorWhite,
                             highlightColor: _buttonHighlightColor,
                             child: Text(
-                              "1",
+                              "3",
                               style: TextStyle(
                                 color: _buttonColorGrey,
                                 fontSize: _buttonFontSize,
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("3");
                             },
                           ),
                         ),
@@ -335,7 +340,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("+");
                             },
                           ),
                         ),
@@ -360,7 +365,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("0");
                             },
                           ),
                         ),
@@ -377,7 +382,7 @@ class CalculatorAppState extends State<MainApp> {
                               ),
                             ),
                             onPressed: () {
-                              // TODO: do something in here
+                              appendValue("=");
                             },
                           ),
                         ),
@@ -386,10 +391,117 @@ class CalculatorAppState extends State<MainApp> {
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
+
+  @override
+  void initState() {
+    super.initState();
+    sbValue.write("0");
+    operator = "";
+  }
+
+  void appendValue(String str) => setState(() {
+        bool isDoCalculate = false;
+        String strValue = sbValue.toString();
+        String lastCharacter = strValue.substring(strValue.length - 1);
+        if (str == "0" &&
+            (lastCharacter == "/" ||
+                lastCharacter == "x" ||
+                lastCharacter == "-" ||
+                lastCharacter == "+")) {
+          return;
+        } else if (str == "0" && sbValue.toString() == "0") {
+          return;
+        } else if (str == "=") {
+          isDoCalculate = true;
+        } else if (str == "/" || str == "x" || str == "-" || str == "+") {
+          if (operator.isEmpty) {
+            operator = str;
+          } else {
+            isDoCalculate = true;
+          }
+        }
+
+        if (!isDoCalculate) {
+          if (sbValue.toString() == "0" && str != "0") {
+            sbValue.clear();
+          }
+          sbValue.write(str);
+        } else {
+          List<String> values = sbValue.toString().split(operator);
+          if (values.length == 2 &&
+              values[0].isNotEmpty &&
+              values[1].isNotEmpty) {
+            valueA = int.parse(values[0]);
+            valueB = int.parse(values[1]);
+            sbValue.clear();
+            int total = 0;
+            switch (operator) {
+              case "/":
+                total = valueA ~/ valueB;
+                break;
+              case "x":
+                total = valueA * valueB;
+                break;
+              case "-":
+                total = valueA - valueB;
+                break;
+              case "+":
+                total = valueA + valueB;
+            }
+            sbValue.write(total);
+            if (str == "/" || str == "x" || str == "-" || str == "+") {
+              operator = str;
+              sbValue.write(str);
+            } else {
+              operator = "";
+            }
+          } else {
+            String strValue = sbValue.toString();
+            String lastCharacter = strValue.substring(strValue.length - 1);
+            if (str == "/" || str == "x" || str == "-" || str == "+") {
+              operator = "";
+              sbValue.clear();
+              sbValue
+                  .write(strValue.substring(0, strValue.length - 1) + "" + str);
+              operator = str;
+            } else if (str == "=" &&
+                (lastCharacter == "/" ||
+                    lastCharacter == "x" ||
+                    lastCharacter == "-" ||
+                    lastCharacter == "+")) {
+              operator = "";
+              sbValue.clear();
+              sbValue.write(strValue.substring(0, strValue.length - 1));
+            }
+          }
+        }
+      });
+
+  void deleteValue() => setState(() {
+        String strValue = sbValue.toString();
+        if (strValue.length > 0) {
+          String lastCharacter = strValue.substring(strValue.length - 1);
+          if (lastCharacter == "/" ||
+              lastCharacter == "x" ||
+              lastCharacter == "-" ||
+              lastCharacter == "+") {
+            operator = "";
+          }
+          strValue = strValue.substring(0, strValue.length - 1);
+          sbValue.clear();
+          sbValue.write(strValue.length == 0 ? "0" : strValue);
+        }
+      });
+
+  void clearValue() => setState(() {
+        operator = "";
+        sbValue.clear();
+        sbValue.write("0");
+      });
 }
